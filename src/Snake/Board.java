@@ -24,15 +24,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+
+
 public class Board extends JPanel implements ActionListener
 {
-	private final int WIDTH = 300;
-	private final int HEIGHT = 300;
-	private final static int TAIL_SIZE = 10;
+
+	private final int WIDTH = 600;
+	private final int HEIGHT = 560;
+	private final static int TAIL_SIZE = 20;
 	private final static int MAX_TAILS = 999;
 	private final static int RAND_POS = 20;
 	private final int REV_DELAY = 1500;
-	
+
 	public static int delay = 100;
 	public static int points = -1;
 	public static int once = 0;
@@ -40,6 +43,7 @@ public class Board extends JPanel implements ActionListener
 	private static int x[] = new int[MAX_TAILS];
 	private static int y[] = new int[MAX_TAILS];
 
+	public static int multiplier;
 	public static int fHighScore;
 	public static int revTime = 0;
 	public static int tails;
@@ -75,7 +79,7 @@ public class Board extends JPanel implements ActionListener
 	{
 		addKeyListener(new TAdapter());
 
-		setBackground(Color.black);
+		setBackground(Color.orange);
 
 		Scanner file = new Scanner(new FileReader("highScore.txt"));
 		fHighScore = file.nextInt();
@@ -133,11 +137,25 @@ public class Board extends JPanel implements ActionListener
 		tail = marioTail;
 		//      portal = head;
 
+		
+		
 		setFocusable(true);
 		inBounds(); 
 
-		playSound(10);       
+		playSound(50);       
 	}   
+	
+//	public static void addPoints()
+//	{
+//		if(Snake.easyRB.isSelected())
+//			multiplier = 1;
+//		
+//		if(Snake.medRB.isSelected())
+//			multiplier = 3;
+//		
+//		if(Snake.hardRB.isSelected())
+//			multiplier = 5;
+//	}
 
 	public static void restart() throws FileNotFoundException
 	{
@@ -154,6 +172,8 @@ public class Board extends JPanel implements ActionListener
 		locateSuperFood();
 		locateRand();
 		locateRevFood();
+		
+		reversed = false;
 		
 		playing = true;
 		points = 0;
@@ -243,7 +263,7 @@ public class Board extends JPanel implements ActionListener
 		catch(Exception ex)
 		{
 			System.out.println("Error with playing sound.");
-			ex.printStackTrace();
+			ex.printStackTrace(); 
 		}
 	}
 
@@ -338,6 +358,10 @@ public class Board extends JPanel implements ActionListener
 
 		if(playing)
 		{
+			Font small = new Font("Helvetica", Font.BOLD, 14);
+			g.setColor(Color.white);
+			g.setFont(small);
+			g.drawString(Integer.toString(points), 585, 12);
 			g.drawImage(eat, food_x, food_y, this);
 			g.drawImage(revImage, revFood_x, revFood_y, this);
 			g.drawImage(badFood, badFood_x, badFood_y, this);
@@ -430,53 +454,84 @@ public class Board extends JPanel implements ActionListener
 		return;
 	}
 
+
 	public void checkFood()
 	{
-		if ((x[0] == food_x) && (y[0] == food_y))
+		for(int i = 0; i < 15; i++)
 		{
-			eatSound();
-			tails++;
-			locateFood();
-		}
-
-		if ((x[0] == superFood_x) && (y[0] == superFood_y))
-		{
-			superFruitSound();
-			tails++;
-			tails++;
-			locateSuperFood();
-		}
-
-		if((x[0] == revFood_x) && (y[0] == revFood_y))
-		{           
-			if(!reversed)
+			for(int k = 0; k < 15; k++)
 			{
-				revFruitSound();
-				revTime = 15;
-				reversed = true;      		
+				if ((x[0] + i == food_x + k) && (y[0] + i == food_y + k))
+				{
+					eatSound();
+					tails++;
+					locateFood();
+				}
 			}
-			else if(reversed)
-				reversed = false;
-			locateRevFood();
 		}
 
-		if ((x[0] == badFood_x) && (y[0] == badFood_y))
+		for(int i = 0; i < 15; i++)
 		{
-			badFruitSound();
-			if(tails > 1)
+			for(int k = 0; k < 15; k++)
 			{
-				tails--;
-				tails--;
+				if ((x[0] + i == superFood_x + k) && (y[0] + i == superFood_y + k))
+				{
+					superFruitSound();
+					tails++;
+					tails++;
+					locateSuperFood();
+				}
 			}
-			locateBadFood();
 		}
 
-		if ((x[0] == portal_x) && (y[0] == portal_y))
+		for(int i = 0; i < 15; i++)
 		{
-			x[0] = rand_x;
-			y[0] = rand_y;
-			locatePortal();
-			locateRand();
+			for(int k = 0; k < 15; k++)
+			{
+				if((x[0] + i == revFood_x + k) && (y[0] + i == revFood_y + k))
+				{           
+					if(!reversed)
+					{
+						revFruitSound();
+						revTime = 100;
+						reversed = true;      		
+					}
+					else if(reversed)
+						reversed = false;
+					locateRevFood();
+				}
+			}
+		}
+
+		for(int i = 0; i < 15; i++)
+		{
+			for(int k = 0; k < 15; k++)
+			{
+				if ((x[0] + i == badFood_x + k) && (y[0] + i == badFood_y + k))
+				{
+					badFruitSound();
+					if(tails-2 > 1)
+					{
+						tails--;
+						tails--;
+					}
+					locateBadFood();
+				}
+			}
+		}
+
+		for(int i = 0; i < 15; i++)
+		{
+			for(int k = 0; k < 15; k++)
+			{
+				if ((x[0] + i == portal_x + k) && (y[0] + i == portal_y + k))
+				{
+					x[0] = rand_x;
+					y[0] = rand_y;
+					locatePortal();
+					locateRand();
+				}
+			}
 		}
 	}
 
@@ -541,6 +596,26 @@ public class Board extends JPanel implements ActionListener
 			playing = false;
 		}
 	}
+	
+	public static void addPoints()
+	{
+		if(Snake.pointsMult == 1)
+			points++;
+		
+		else if(Snake.pointsMult == 2)
+		{
+			points++;
+			points++;
+		}
+		
+		else if(Snake.pointsMult == 3)
+		{
+			points++;
+			points++;
+			points++;
+			points++;
+		}
+	}
 
 	public static void locateFood() 
 	{
@@ -548,7 +623,7 @@ public class Board extends JPanel implements ActionListener
 		food_x = ((r * TAIL_SIZE));
 		r = (int) (Math.random() * RAND_POS);
 		food_y = ((r * TAIL_SIZE));
-		points++;
+		addPoints();
 	}
 
 	public static void locateRand() 
@@ -573,8 +648,8 @@ public class Board extends JPanel implements ActionListener
 		superFood_x = ((r * TAIL_SIZE));
 		r = (int) (Math.random() * RAND_POS);
 		superFood_y = ((r * TAIL_SIZE));
-		points++;
-		points++;
+		addPoints();
+		addPoints();
 	}
 
 	public static void locateBadFood() 
@@ -751,3 +826,4 @@ public class Board extends JPanel implements ActionListener
 		}
 	}
 }
+

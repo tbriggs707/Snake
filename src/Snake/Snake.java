@@ -1,6 +1,8 @@
 package Snake;
 
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
@@ -20,15 +22,26 @@ import javax.swing.JRadioButtonMenuItem;
 
 public class Snake extends JFrame implements ActionListener
 {
+	static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	static final double width = screenSize.getWidth();
+	static final double height = screenSize.getHeight();
+	
 	private JMenuBar menuMB = new JMenuBar();
 	
 	private JMenu gameM, optionsM, helpM; //pg. 686
 	private JMenuItem newGame, pauseI, exitI, diffI, rulesI;
 	
 	private JLabel scoreL;
+	
+	public static int pointsMult = 1;
 
 	private ButtonGroup difficulty, theme;
-	private JRadioButtonMenuItem easyRB, medRB, hardRB, theme1, theme2, theme3;
+	public static JRadioButtonMenuItem easyRB;
+	public static JRadioButtonMenuItem medRB;
+	public static JRadioButtonMenuItem hardRB;
+	private JRadioButtonMenuItem theme1;
+	private JRadioButtonMenuItem theme2;
+	private JRadioButtonMenuItem theme3;
 //	private JCheckBoxMenuItem doubled;
 	private String helpStr;
 	public static Board Gameboard;
@@ -40,7 +53,7 @@ public class Snake extends JFrame implements ActionListener
         pane.add(Gameboard);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(320, 340);
+        setSize(640, 620);
         setLocationRelativeTo(null);
         setTitle("©2013 Snake");
         
@@ -92,6 +105,7 @@ public class Snake extends JFrame implements ActionListener
         easyRB = new JRadioButtonMenuItem("Beginner", true);
         medRB = new JRadioButtonMenuItem("Better");
         hardRB = new JRadioButtonMenuItem("Best");
+        
         theme1 = new JRadioButtonMenuItem("Default");
         theme2 = new JRadioButtonMenuItem("Pac Man");
         theme3 = new JRadioButtonMenuItem("Mario", true);  
@@ -141,112 +155,118 @@ public class Snake extends JFrame implements ActionListener
 		rulesI.addActionListener(this);
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
-		if(e.getSource().equals(rulesI))
+	
+		public void actionPerformed(ActionEvent e)
 		{
-			if(!Board.pause)
+			if(e.getSource().equals(rulesI))
+			{
+				if(!Board.pause)
+				{
+					Board.pauseSound();
+					Board.timer.stop();
+					Board.pause = true;
+				}
+				
+				
+				JOptionPane.showMessageDialog(null, helpStr, "Help", JOptionPane.INFORMATION_MESSAGE);
+			}
+			
+			if(e.getSource().equals(exitI))
+			{
+//				Board.revFruitSound();
+				System.exit(1);
+			}
+			
+			if(e.getSource().equals(newGame))
+			{
+				try
+				{
+					Board.restart();
+				}
+				
+				catch (FileNotFoundException e1) 
+				{
+					e1.printStackTrace();
+				}
+			}
+			
+			if(e.getSource().equals(pauseI))
 			{
 				Board.pauseSound();
-				Board.timer.stop();
-				Board.pause = true;
-			}
-			
-			
-			JOptionPane.showMessageDialog(null, helpStr, "Help", JOptionPane.INFORMATION_MESSAGE);
-		}
-		
-		if(e.getSource().equals(exitI))
-		{
-//				Board.revFruitSound();
-			System.exit(1);
-		}
-		
-		if(e.getSource().equals(newGame))
-		{
-			try
-			{
-				Board.restart();
-			}
-			
-			catch (FileNotFoundException e1) 
-			{
-				e1.printStackTrace();
-			}
-		}
-		
-		if(e.getSource().equals(pauseI))
-		{
-			Board.pauseSound();
 //            	System.out.println("Selected pauseI");
-        	if(!Board.pause)
-        	{
-        		Board.timer.stop();
-        		Board.pause = true;
-        		
+            	if(!Board.pause)
+            	{
+            		Board.timer.stop();
+            		Board.pause = true;
+            		
 //            		System.out.println("Paused");
-        	}
-        	else if(Board.pause)
-        	{
-        		Board.pause = false;
-        		Board.timer.restart();
+            	}
+            	else if(Board.pause)
+            	{
+            		Board.pause = false;
+            		Board.timer.restart();
 //            		System.out.println("Unpaused");
-        	}
-		}
-		
-		if(e.getSource().equals(easyRB))
-		{
-			Board.diffChangeSound();				
-			Board.timer.setDelay(100);
-			Board.points = 0;
-			Board.tails = 3;
-		}
-		
-		if(e.getSource().equals(medRB))
-		{
-			Board.diffChangeSound();
-			Board.timer.setDelay(75);
-			Board.points = 0;
-			Board.tails = 3;
-		}
-		
-		if(e.getSource().equals(hardRB))
-		{			
-			Board.diffChangeSound();
-			Board.timer.setDelay(25);
-			Board.points = 0;
-			Board.tails = 3;
-		}
-		
-		if(e.getSource().equals(theme1))
-		{
-			Board.newGameSound();
-	        Board.head = Board.blueHead;
-	        Board.eat = Board.apple;
-	        Board.tail = Board.redTail;
-		}
-		
-		if(e.getSource().equals(theme2))
-		{
-			Board.newGameSound();
-			Board.head = Board.pacManR;
-			Board.tail = Board.deadGhost;
-			Board.eat = Board.redGhost;
-		}
-		
-		if(e.getSource().equals(theme3))
-		{
-			Board.newGameSound();
-			Board.head = Board.marioHead;
-			Board.tail = Board.marioTail;
-			Board.eat = Board.marioFood;				
-		}
+            	}
+			}
 			
-	}
+			if(e.getSource().equals(easyRB))
+			{
+				Board.diffChangeSound();				
+				Board.timer.setDelay(100);
+				Board.points = 0;
+				Board.tails = 3;
+				pointsMult = 1;
+			}
+			
+			if(e.getSource().equals(medRB))
+			{
+				Board.diffChangeSound();
+				Board.timer.setDelay(75);
+				Board.points = 0;
+				Board.tails = 3;
+				pointsMult = 2;
+			}
+			
+			if(e.getSource().equals(hardRB))
+			{			
+				Board.diffChangeSound();
+				Board.timer.setDelay(25);
+				Board.points = 0;
+				Board.tails = 3;
+				pointsMult = 3;
+			}
+			
+			if(e.getSource().equals(theme1))
+			{
+				Board.newGameSound();
+		        Board.head = Board.blueHead;
+		        Board.eat = Board.apple;
+		        Board.tail = Board.redTail;
+			}
+			
+			if(e.getSource().equals(theme2))
+			{
+				Board.newGameSound();
+				Board.head = Board.pacManR;
+				Board.tail = Board.deadGhost;
+				Board.eat = Board.redGhost;
+			}
+			
+			if(e.getSource().equals(theme3))
+			{
+				Board.newGameSound();
+				Board.head = Board.marioHead;
+				Board.tail = Board.marioTail;
+				Board.eat = Board.marioFood;				
+			}
+				
+		}
 	
 	
     public static void main(String[] args) throws FileNotFoundException
     {
         new Snake();
     }
+
+
 }
