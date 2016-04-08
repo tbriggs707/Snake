@@ -454,7 +454,6 @@ public class Board extends JPanel implements ActionListener
 		return;
 	}
 
-
 	public void checkFood()
 	{
 		for(int i = 0; i < 15; i++)

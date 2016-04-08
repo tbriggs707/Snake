@@ -155,8 +155,7 @@ public class Snake extends JFrame implements ActionListener
 		rulesI.addActionListener(this);
 	}
 
-	
-		public void actionPerformed(ActionEvent e)
+	public void actionPerformed(ActionEvent e)
 		{
 			if(e.getSource().equals(rulesI))
 			{
@@ -262,11 +261,8 @@ public class Snake extends JFrame implements ActionListener
 				
 		}
 	
-	
     public static void main(String[] args) throws FileNotFoundException
     {
         new Snake();
     }
-
-
 }
