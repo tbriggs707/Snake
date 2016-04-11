@@ -1,5 +1,4 @@
-Teran Briggs
-A01131750
+My final project for my Intro to GUIs using Java.
 
 ©2013 Snake by Teran Inc.
 
